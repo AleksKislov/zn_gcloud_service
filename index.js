@@ -2,19 +2,24 @@ const app = require("express")();
 const axios = require("axios");
 const auth = require("./middleware/auth");
 require("dotenv").config();
-
-const { SPECIAL_TOKEN } = process.env;
 const authGet = auth(true);
 
 app.get("/reset", authGet, async (req, res) => {
-  try {
-    await axios.post();
+  const { SPECIAL_TOKEN, URL_TO_KNOCK } = process.env;
+  const config = {
+    headers: { "special-token": SPECIAL_TOKEN, "Content-Type": "application/json" }
+  };
 
-    res.status(200).send("Success");
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Server error");
-  }
+  axios
+    .post(URL_TO_KNOCK, {}, config)
+    .then(result => {
+      console.log("RESPONSE RECEIVED: ", result.data);
+      res.status(200).send("Success");
+    })
+    .catch(err => {
+      console.log("AXIOS ERROR: ", err);
+      res.status(500).send("Server error");
+    });
 });
 
 const PORT = process.env.PORT || 6060;
